@@ -1,9 +1,5 @@
 ﻿using System.Text;
 
-
-
-
-
 internal partial class Program
 {
     #region CONSTANTS
@@ -21,87 +17,6 @@ internal partial class Program
     const string RESOURCE_TAG   = "@resource";
     #endregion
 
-        /// <summary>
-        /// Parses out the property lines from model docs.
-        /// </summary>
-        /// <param name="modelLines"></param>
-        /// <param name="i"></param>
-        /// <param name="propertyLine"></param>
-        /// <param name="property"></param>
-        /// <returns></returns>
-        static int ParseProperty(List<string> modelLines, int i, string propertyLine, Property property)
-        {
-            //Get the description and save to property.Description.
-            string? description =
-                propertyLine.Split(']')
-                    .Last()
-                    .Trim();
-
-            if (!string.IsNullOrEmpty(description))
-            {
-                property.Description = description;
-            }
-
-            //Check for multiline property description and parse if present.
-            bool hasMoreLines = modelLines.Count > i + 1;
-            bool isPropertyLine = modelLines[i].Contains("@property");
-            bool isExtendedDescription = hasMoreLines &&
-                                         isPropertyLine &&
-                                         modelLines[i + 1][0] == '#' &&
-                                         !modelLines[i + 1].Contains("@example") &&
-                                         !modelLines[i + 1].Contains("@property");
-
-            //If there is an extended property description, add that line to the mode.
-            if (isExtendedDescription)
-            {
-                i++;
-                property.Description += "\n\n" + modelLines[i].Split('#').Last().Trim();
-            }
-
-            return i;
-        }
-
-        /// <summary>
-        /// Runs through the controller and parses out the resource block.
-        /// </summary>
-        /// <param name="SWAGGER_KEY"></param>
-        /// <param name="RESOURCE_TAG"></param>
-        /// <param name="controllerLines"></param>
-        /// <param name="resource"></param>
-        /// <param name="resourceDesc"></param>
-        /// <param name="i"></param>
-        /// <returns></returns>
-        static int ParseResourceBlock(string SWAGGER_KEY, string RESOURCE_TAG, List<string> controllerLines, StringBuilder resource, StringBuilder resourceDesc, int i)
-        {
-            string line = controllerLines[i];
-
-            //Parse the @resource block.
-            resource.Append(
-                controllerLines[i].Split(RESOURCE_TAG)
-                                    .Last()
-                                    .Trim());
-            i++;
-
-            //Get the resource description, which can be multiline.
-            //Walk forward from the @resource line until the first line without a #.
-            int endOfResourceBlock = 0;
-            StringBuilder resourceDescSBuilder = new StringBuilder();
-
-            while (controllerLines[i].Contains('#'))
-            {
-                var currentLine = controllerLines[i + endOfResourceBlock].Split('#').Last().Trim();
-
-                if (currentLine.Length > 1)
-                {
-                    resourceDesc.AppendLine(currentLine);
-                }
-
-                i++;
-            }
-
-            //Done with @resource block.
-            return i;
-        }
 
     private static void Main(string[] args)
     {
@@ -118,27 +33,106 @@ internal partial class Program
 
         #endregion
 
-        #region Main Execution
-
         //Iterate over list of model paths, parsing out name, properties, descriptions, and examples
         ParseModelDocs(_models, modelFiles);
 
         //Go through list of controller paths.
         ParseControllerDocs(_endpoints, controllerFiles);
-
     }
 
-/// <summary>
-/// Drives the parsing of all controllers in the designated folders.
-/// </summary>
-/// <param name="_endpoints"></param>
-/// <param name="controllerFiles"></param>
+    /// <summary>
+    /// Parses out the property lines from model docs.
+    /// </summary>
+    /// <param name="modelLines"></param>
+    /// <param name="i"></param>
+    /// <param name="propertyLine"></param>
+    /// <param name="property"></param>
+    /// <returns></returns>
+    static int ParseModelProperty(List<string> modelLines, int i, string propertyLine, Property property)
+    {
+        //Get the description and save to property.Description.
+        string? description =
+            propertyLine.Split(']')
+                .Last()
+                .Trim();
+
+        if (!string.IsNullOrEmpty(description))
+        {
+            property.Description = description;
+        }
+
+        //Check for multiline property description and parse if present.
+        bool hasMoreLines = modelLines.Count > i + 1;
+        bool isPropertyLine = modelLines[i].Contains("@property");
+        bool isExtendedDescription = hasMoreLines &&
+                                        isPropertyLine &&
+                                        modelLines[i + 1][0] == '#' &&
+                                        !modelLines[i + 1].Contains("@example") &&
+                                        !modelLines[i + 1].Contains("@property");
+
+        //If there is an extended property description, add that line to the mode.
+        if (isExtendedDescription)
+        {
+            i++;
+            property.Description += "\n\n" + modelLines[i].Split('#').Last().Trim();
+        }
+
+        return i;
+    }
+
+    /// <summary>
+    /// Runs through the controller and parses out the resource block.
+    /// </summary>
+    /// <param name="SWAGGER_KEY"></param>
+    /// <param name="RESOURCE_TAG"></param>
+    /// <param name="controllerLines"></param>
+    /// <param name="resource"></param>
+    /// <param name="resourceDesc"></param>
+    /// <param name="i"></param>
+    /// <returns></returns>
+    static int ParseControllerResourceBlock(string SWAGGER_KEY, string RESOURCE_TAG, List<string> controllerLines, StringBuilder resource, StringBuilder resourceDesc, int i)
+    {
+        string line = controllerLines[i];
+
+        //Parse the @resource block.
+        resource.Append(
+            controllerLines[i].Split(RESOURCE_TAG)
+                                .Last()
+                                .Trim());
+        i++;
+
+        //Get the resource description, which can be multiline.
+        //Walk forward from the @resource line until the first line without a #.
+        int endOfResourceBlock = 0;
+        StringBuilder resourceDescSBuilder = new StringBuilder();
+
+        while (controllerLines[i].Contains('#'))
+        {
+            var currentLine = controllerLines[i + endOfResourceBlock].Split('#').Last().Trim();
+
+            if (currentLine.Length > 1)
+            {
+                resourceDesc.AppendLine(currentLine);
+            }
+
+            i++;
+        }
+
+        //Done with @resource block.
+        return i;
+    }
+
+
+    /// <summary>
+    /// Drives the parsing of all controllers in the designated folders.
+    /// </summary>
+    /// <param name="_endpoints"></param>
+    /// <param name="controllerFiles"></param>
     private static void ParseControllerDocs(List<Endpoint> _endpoints, string[] controllerFiles)
     {
         //For every individual controller file, walk through the swagger_yard syntax and serialize into POCO.
         foreach (string controllerFilePath in controllerFiles)
         {
-            List<string> controllerLines;
             ParseIndividualController(_endpoints, controllerFilePath);
         }
     }
@@ -166,7 +160,7 @@ internal partial class Program
                 int resourceTagIndex = controllerLines.FindIndex(res => res.Contains(RESOURCE_TAG));
 
                 //Parse resource block.
-                int controllerIndex = ParseResourceBlock(SWAGGER_KEY, RESOURCE_TAG, controllerLines, resource, resourceDesc, resourceTagIndex);
+                int controllerIndex = ParseControllerResourceBlock(SWAGGER_KEY, RESOURCE_TAG, controllerLines, resource, resourceDesc, resourceTagIndex);
 
                 //Proceed with parsing all of the endpoints in this controller
                 controllerIndex = ParseControllerEndpoints(_endpoints, resource, resourceDesc, controllerLines, endpoint, controllerIndex);
@@ -403,7 +397,7 @@ internal partial class Program
                                     property.DataType = datatype;
 
                                     //Parse multiline descriptions.
-                                    i = ParseProperty(modelLines, i, propertyLine, property);
+                                    i = ParseModelProperty(modelLines, i, propertyLine, property);
 
                                     //Look ahead to see if there is an example
                                     if (modelLines.Count > i + 1 && modelLines[i + 1].Contains("@example"))
@@ -434,14 +428,3 @@ internal partial class Program
         }
     }
 }
-
-#endregion
-#region Program Variables
-
-#endregion
-#region Supporting Methods
-
-#endregion
-#region Main Execution
-
-#endregion
