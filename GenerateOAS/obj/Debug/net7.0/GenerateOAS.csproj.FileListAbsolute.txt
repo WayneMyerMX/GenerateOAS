@@ -1,0 +1,15 @@
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.csproj.AssemblyReference.cache
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.GeneratedMSBuildEditorConfig.editorconfig
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.AssemblyInfoInputs.cache
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.AssemblyInfo.cs
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.csproj.CoreCompileInputs.cache
+/Users/wayne.myer/GenerateOAS/GenerateOAS/bin/Debug/net7.0/GenerateOAS
+/Users/wayne.myer/GenerateOAS/GenerateOAS/bin/Debug/net7.0/GenerateOAS.deps.json
+/Users/wayne.myer/GenerateOAS/GenerateOAS/bin/Debug/net7.0/GenerateOAS.runtimeconfig.json
+/Users/wayne.myer/GenerateOAS/GenerateOAS/bin/Debug/net7.0/GenerateOAS.dll
+/Users/wayne.myer/GenerateOAS/GenerateOAS/bin/Debug/net7.0/GenerateOAS.pdb
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.dll
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/refint/GenerateOAS.dll
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.pdb
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.genruntimeconfig.cache
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/ref/GenerateOAS.dll

@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "GenerateOAS/1.0.0": {
+        "runtime": {
+          "GenerateOAS.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "GenerateOAS/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
