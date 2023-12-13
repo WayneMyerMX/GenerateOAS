@@ -13,3 +13,5 @@
 /Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.pdb
 /Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.genruntimeconfig.cache
 /Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/ref/GenerateOAS.dll
+/Users/wayne.myer/GenerateOAS/GenerateOAS/bin/Debug/net7.0/Newtonsoft.Json.dll
+/Users/wayne.myer/GenerateOAS/GenerateOAS/obj/Debug/net7.0/GenerateOAS.csproj.CopyComplete

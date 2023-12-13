@@ -38,6 +38,9 @@ internal partial class Program
 
         //Go through list of controller paths.
         ParseControllerDocs(_endpoints, controllerFiles);
+
+        string deleteMe = ClassesToJsonConverter.ConvertObjects(_endpoints);
+        Console.WriteLine(deleteMe);
     }
 
     /// <summary>
@@ -187,7 +190,7 @@ internal partial class Program
                 controllerIndex++;
             }
 
-            //Does the endpoint block contain @path?
+            //Does the endpoint block contain @path?  Yes, it's an endpoint.
             if (endpointRawBlock.Any(p => p.Contains(PATH)))
             {
                 //Assemble the endpoint docs that are in this raw block.
@@ -268,27 +271,37 @@ internal partial class Program
                 {
                     Response response = new Response();
                     string respLine = endpointRawBlock[respIdx];
-                    string responseCode = respLine.Split(RESPONSE).First().Trim();
-                    string responseDesc = respLine.Split(RESPONSE).Last().Trim();
+                    string responseCode = respLine.Split(RESPONSE).Last().Trim().Split(' ').First().Trim();
+                    string responseDesc = respLine.Split(responseCode).Last().Trim();
                     response.ResponseCode = responseCode;
                     response.ResponseDesc = responseDesc;
                     endpoint.Responses.Add(response);
                 }
 
                 //Parse response_type for this endpoint.
-                string respTypeLine = endpointRawBlock[endpointRawBlock.FindIndex(respType => respType.Contains(RESPONSE_TYPE))];
-                string respType = respTypeLine.Trim('[').Trim(']');
-                endpoint.ResponseDataType = respType;
-
+                if(endpointRawBlock.Any(rType => rType.Contains(RESPONSE_TYPE)))
+                {
+                    string respTypeLine = endpointRawBlock[endpointRawBlock.FindIndex(respType => respType.Contains(RESPONSE_TYPE))];
+                    string respType = respTypeLine.Split('[').Last().Trim('[').Trim(']').Trim();
+                    endpoint.ResponseDataType = respType;
+                }
                 //Parse example request for this endpoint.
                 int exampleReqIdx = endpointRawBlock.FindIndex(exReq => exReq.Contains(EXAMPLE_REQ));
-                //The next line is the JSON of the example request.
-                endpoint.ExampleRequest = endpointRawBlock[exampleReqIdx + 1];
+
+                if(exampleReqIdx > 1)
+                {
+                    //The next line is the JSON of the example request.
+                    endpoint.ExampleRequest = endpointRawBlock[exampleReqIdx + 1];
+                }
 
                 //Parse example response for this endpoint. Disambiguate between @example and @example_request.
                 int exampleRespIdx = endpointRawBlock.FindIndex(exResp => exResp.Contains(EXAMPLE) && !exResp.Contains(EXAMPLE_REQ));
-                //The next line is the JSON of the example response.
-                endpoint.ExampleResponse = endpointRawBlock[exampleRespIdx + 1];
+
+                if(exampleRespIdx > 1)
+                {
+                    //The next line is the JSON of the example response.
+                    endpoint.ExampleResponse = endpointRawBlock[exampleRespIdx + 1].Trim().Trim('#').Trim();
+                }
 
                 //Finshed parsing this endpoint. Save the object, clear the controllerLines list.
                 _endpoints.Add(endpoint);

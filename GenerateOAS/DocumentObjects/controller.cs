@@ -8,12 +8,24 @@ public class Endpoint{
     //The name of the endpoint.
     public string? Name {get;set;}
 
-    //Description of what the endpoint does and any other related information.
+    /// <summary>
+    /// Description of what the endpoint does and any other related information.
+    /// </summary>
     public string? Description {get;set;}
+
+    /// <summary>
+    /// Summary text of the endpoint.
+    /// </summary>
     public string? Summary {get;set;}
 
-    //The URL for this endpoint.
+    /// <summary>
+    /// The URL for this endpoint.
+    /// </summary>
     public string? Path {get;set;}
+
+    /// <summary>
+    /// List of parameters used to call this endpoint.
+    /// </summary>
     public List<Parameter> Parameters {get;set;}
     public List<string> Tags {get;set;}
     public Verbs Verb {get;set;}

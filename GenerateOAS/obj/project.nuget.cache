@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "LLnlEIa899ivZq+6lxwKNGjnG4MO1KB9J6Z2db5svXyaMZ5j3J0tLLrlp58ZfrJImnzZGmNXWaGEEX/anCArKQ==",
+  "dgSpecHash": "J1+J/jiG/Mht4GWu47uXJvHyA7EMzhc8oC88GwDPlG3eoOZ3Yt5LvNsbnU0Buq7PtB0CZq9ZJJpUX+HoLgcIgA==",
   "success": true,
   "projectFilePath": "/Users/wayne.myer/GenerateOAS/GenerateOAS/GenerateOAS.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/wayne.myer/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
   "logs": []
 }
