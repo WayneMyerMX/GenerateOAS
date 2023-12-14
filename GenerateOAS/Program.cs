@@ -281,6 +281,8 @@ internal partial class Program
                 }
 
                 //Parse response_type for this endpoint.
+                //TODO: some Platform endpoints can return multiple datatypes. That is probably best handled by
+                //an additional documentation block.
                 if(endpointRawBlock.Any(rType => rType.Contains(RESPONSE_TYPE)))
                 {
                     string respTypeLine = endpointRawBlock[endpointRawBlock.FindIndex(respType => respType.Contains(RESPONSE_TYPE))];
