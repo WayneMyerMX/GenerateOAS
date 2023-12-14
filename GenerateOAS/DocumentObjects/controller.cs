@@ -57,13 +57,8 @@ public class Parameter
     public string? Description {get;set;}
     public ParamLocation Location {get;set;}
     public Verbs Verb {get;set;}
-    public List<Response> Responses {get;set;}
-
-    public Parameter()
-    {
-        this.Responses = new List<Response>();
-    }
 }
+
 
 public class Response
 {

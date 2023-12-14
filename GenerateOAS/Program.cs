@@ -159,19 +159,18 @@ internal partial class Program
             //Check for the @resource tag. If tag is present, controller is swaggerized. Otherwise go to the next controller.
             if (controllerLines.Any(p => p.Contains(RESOURCE_TAG)))
             {
-                Endpoint endpoint = new Endpoint();
                 int resourceTagIndex = controllerLines.FindIndex(res => res.Contains(RESOURCE_TAG));
 
                 //Parse resource block.
                 int controllerIndex = ParseControllerResourceBlock(SWAGGER_KEY, RESOURCE_TAG, controllerLines, resource, resourceDesc, resourceTagIndex);
 
                 //Proceed with parsing all of the endpoints in this controller
-                controllerIndex = ParseControllerEndpoints(_endpoints, resource, resourceDesc, controllerLines, endpoint, controllerIndex);
+                controllerIndex = ParseControllerEndpoints(_endpoints, resource, resourceDesc, controllerLines, controllerIndex);
             }
         }
     }
 
-    private static int ParseControllerEndpoints(List<Endpoint> _endpoints, StringBuilder resource, StringBuilder resourceDesc, List<string> controllerLines, Endpoint endpoint, int controllerIndex)
+    private static int ParseControllerEndpoints(List<Endpoint> _endpoints, StringBuilder resource, StringBuilder resourceDesc, List<string> controllerLines, int controllerIndex)
     {
         for (; controllerIndex < controllerLines.Count; controllerIndex++)
         {
@@ -193,6 +192,8 @@ internal partial class Program
             //Does the endpoint block contain @path?  Yes, it's an endpoint.
             if (endpointRawBlock.Any(p => p.Contains(PATH)))
             {
+                Endpoint endpoint = new Endpoint();
+
                 //Assemble the endpoint docs that are in this raw block.
                 //Format is:
                 //##
@@ -248,6 +249,7 @@ internal partial class Program
                         .First()
                         .Trim());
                     //Get param data type (in []).
+                    //TODO: Warn if data type is missing in this line.
                     parameter.DataType = paramLine.Split('[').Last().Split(']').First().Trim();
                     //Get param description (can be multiline).
                     StringBuilder sbParaDesc = new StringBuilder();
@@ -263,7 +265,7 @@ internal partial class Program
                     //Move to the next parameter.
                 }
 
-                //Parse responses docs for this endpoint.
+                //Endpoints can return multiple resonse codes. Parse responses docs for this endpoint.
                 int firstRespIndex = endpointRawBlock.FindIndex(resp => resp.Contains(RESPONSE));
                 int lastRespIndex = endpointRawBlock.FindLastIndex(resp => resp.Contains(RESPONSE));
 
@@ -285,6 +287,7 @@ internal partial class Program
                     string respType = respTypeLine.Split('[').Last().Trim('[').Trim(']').Trim();
                     endpoint.ResponseDataType = respType;
                 }
+
                 //Parse example request for this endpoint.
                 int exampleReqIdx = endpointRawBlock.FindIndex(exReq => exReq.Contains(EXAMPLE_REQ));
 
