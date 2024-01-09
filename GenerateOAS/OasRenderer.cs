@@ -1,5 +1,56 @@
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Linq;
+
+public class OpenApiConverter
+{
+    public string ConvertToOpenApi(string json)
+    {
+        var endpoint = JsonConvert.DeserializeObject<Endpoint>(json);
+
+        var openApi = new
+        {
+            openapi = "3.0.0",
+            info = new { title = endpoint.Resource, description = endpoint.ResourceDesc, version = "1.0.0" },
+            paths = new
+            {
+
+            }
+            // paths = new
+            // {
+            //     [endpoint.Path] = new
+            //     {
+            //         [endpoint.Verb switch
+            //         {
+            //             0 => "get",
+            //             _ => "post"
+            //         }] = new
+            //         {
+            //             summary = endpoint.Summary ?? endpoint.Description,
+            //             description = endpoint.Description,
+            //             parameters: endpoint.Parameters?.Select(param => new
+            //             {
+            //                 name: param.ParamName,
+            //                 in: "path", // You might need to modify this based on the parameter location
+            //                 required: true, // You might need to modify this based on the parameter location
+            //                 schema: new { type = param.DataType.ToLowerInvariant() }
+            //             })?.ToList(),
+            //             responses: new
+            //             {
+            //                 [endpoint.Responses?.FirstOrDefault()?.ResponseCode ?? "default"] = new
+            //                 {
+            //                     description: endpoint.Responses?.FirstOrDefault()?.ResponseDesc ?? "Default response"
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+        };
+
+        return JsonConvert.SerializeObject(openApi, Formatting.Indented);
+    }
+}
 
 public class ClassesToJsonConverter
 {
@@ -20,7 +71,7 @@ public class ClassesToJsonConverter
 //Autogen stubs of routes and models
 /*
 Route:
-[Route("endpoint")]
+[Route("endpoint URL")]
 public partial class EndpointName : Controller ()
 
 [Route("api/[controller]")]

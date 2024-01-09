@@ -1,11 +1,17 @@
 public class Endpoint{
-    //The name of the resource to which this endpoint belongs.
+    /// <summary>
+    /// The name of the resource to which this endpoint belongs.
+    /// </summary>
     public string? Resource {get;set;}
 
-    //The description of the resource to which this endpoint belongs.
+    /// <summary>
+    /// The description of the resource to which this endpoint belongs.
+    /// </summary>
     public string? ResourceDesc{get;set;}
 
-    //The name of the endpoint.
+    /// <summary>
+    /// The name of the endpoint.
+    /// </summary>
     public string? Name {get;set;}
 
     /// <summary>
@@ -27,7 +33,15 @@ public class Endpoint{
     /// List of parameters used to call this endpoint.
     /// </summary>
     public List<Parameter> Parameters {get;set;}
+
+    /// <summary>
+    /// List of Tags to apply to this endpoint.
+    /// </summary>
     public List<string> Tags {get;set;}
+
+    /// <summary>
+    /// HTTP verb for this endpoint.
+    /// </summary>
     public Verbs Verb {get;set;}
     public string? ExampleRequest {get;set;}
     public string? ExampleResponse {get;set;}
@@ -66,7 +80,7 @@ public class Response
     public string? ResponseDesc {get;set;}
 }
 
-public enum ParamLocation {path, body, query, formData};
+public enum ParamLocation {path, body, query, formData, header};
 
 public enum Verbs
 {

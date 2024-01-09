@@ -5,7 +5,7 @@ internal partial class Program
     #region CONSTANTS
     static string[] MODEL_KEYWORDS     = { "@!model", "@model" };
     static string[] NULL_OR_REQ        = { "nullable", "required" };
-    static string[] PARAM_LOCS         = { "query", "path", "body" };
+    static string[] PARAM_LOCS         = { "query", "path", "body", "header" };
     static string[] ENDPOINT_KEYWORDS  = { "@path", "@parameter", "@response" };
     const string PATH           = "@path";
     const string PARAM          = "@parameter";
@@ -140,12 +140,18 @@ internal partial class Program
         }
     }
 
+    /// <summary>
+    /// Parses a body of controller documentation. Controller docs are keyed by a @resource tag preceding any other controller or endpoint docs.
+    /// </summary>
+    /// <param name="_endpoints"></param>
+    /// <param name="controllerFilePath"></param>
     private static void ParseIndividualController(List<Endpoint> _endpoints, string controllerFilePath)
     {
         //Hold the resource name and description for all of the endpoints in this controller.
         StringBuilder resource = new StringBuilder();
         StringBuilder resourceDesc = new StringBuilder();
         List<string> controllerLines;
+
         //Pull all of this controller's lines into a list for parsing.
         using (StreamReader srControllerReader = new StreamReader(controllerFilePath))
         {
@@ -170,6 +176,15 @@ internal partial class Program
         }
     }
 
+    /// <summary>
+    /// Parses the extended swagger_yard syntax for endpoints within a controller.
+    /// </summary>
+    /// <param name="_endpoints"></param>
+    /// <param name="resource"></param>
+    /// <param name="resourceDesc"></param>
+    /// <param name="controllerLines"></param>
+    /// <param name="controllerIndex"></param>
+    /// <returns></returns>
     private static int ParseControllerEndpoints(List<Endpoint> _endpoints, StringBuilder resource, StringBuilder resourceDesc, List<string> controllerLines, int controllerIndex)
     {
         for (; controllerIndex < controllerLines.Count; controllerIndex++)
