@@ -15,6 +15,7 @@ public class OpenApiConverter
             info = new { title = endpoint.Resource, description = endpoint.ResourceDesc, version = "1.0.0" },
             paths = new
             {
+                endpoint.Path,
 
             }
             // paths = new
@@ -67,6 +68,36 @@ public class ClassesToJsonConverter
         return sbJson.ToString();
     }
 }
+
+/*
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "[titleConfigValue]",
+        "description": "[descriptionConfigValue]",
+        "version": "[versionConfigValue]"               ---but should this come from the endpoint versions?
+    },
+    "servers": [
+        {
+        "url": "[serversConfigValue]"
+        }
+    ],
+    "paths": {
+        "[endpoint.Path]": {
+            "[endpoint.Verb]": {
+                "tags": [
+                    "[endpoint.Tags.ToArray().ToString()]"
+                ],
+                "operationId": ["endpoint.OperationId"],
+            }
+        }
+    }
+}
+
+
+
+*/
+
 
 //Autogen stubs of routes and models
 /*
