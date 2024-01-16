@@ -89,6 +89,80 @@ public class ClassesToJsonConverter
                     "[endpoint.Tags.ToArray().ToString()]"
                 ],
                 "operationId": ["endpoint.OperationId"],
+                "parameters": [
+                    "name": "paramName",
+                    "description": "paramDesc",
+                    "required": paramRequired,
+                    "in": "paramLocation",
+                    "schema": {
+                        "type"/"$ref": "requestParamDataType" / "#/components/schemas/complexDataTypeName"
+                    },
+                    "name": "paramName",
+                    "description": "paramDesc",
+                    "required": paramRequired,
+                    "in": "paramLocation",
+                    "schema": {
+                        "type"/"$ref": "requestParamDataType" / "#/components/schemas/complexDataTypeName"
+                    }
+                ],
+                "responses": {
+                    "default": {
+                        "description": "descString",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/complexDataType"
+                                },
+                                "example": {
+                                    "dataType": {
+                                        fieldsAndExampleResponses
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "200Description"
+                    }
+                },
+                "description": "This endpoint description."
+                "summary": "This endpoint summary."
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "tagName",
+            "description": "tagDescription"
+        }
+    ],
+    "components": {
+        "schemas": {
+            "modelName": {
+                "type": "object",
+                "properties": {
+                    "fieldName1": {
+                        "type": "fieldDataType".
+                        "example": "fieldExample"
+                    },
+                    "fieldName2": {
+                        "type": "fieldDataType".
+                        "example": "fieldExample"
+                    }
+                }
+            },
+            "modelName": {
+                "type": "object",
+                "properties": {
+                    "fieldName1": {
+                        "type": "fieldDataType".
+                        "example": "fieldExample"
+                    },
+                    "fieldName2": {
+                        "type": "fieldDataType".
+                        "example": "fieldExample"
+                    }
+                }
             }
         }
     }
