@@ -8,46 +8,78 @@ public class OpenApiConverter
     public string ConvertToOpenApi(string json)
     {
         var endpoint = JsonConvert.DeserializeObject<Endpoint>(json);
+        var openApi = new { openApi = "3.0"};
+        //Build OpenAPI intro block.
 
-        var openApi = new
-        {
-            openapi = "3.0.0",
-            info = new { title = endpoint.Resource, description = endpoint.ResourceDesc, version = "1.0.0" },
-            paths = new
+        //Build OpenAPI server block.
+
+        //Build Open API paths block.
+        //Iterate through list of Endpoints
+        /*
+         for each Endpoint
+            "[path]" :{
+                "[verb]": {
+                    "tags": [
+                        list of tags
+                    ],
+                    "parameters": [
+                        {
+                            "name": paramName,
+                            "description": desc,
+                            "required": isRequired,
+                            "in": paramLoc,
+                            "schema": {
+                                "type": dataTypeOrRef
+                            }
+                        }
+                    ],
+                    "responses": {
+                        "responseCode": {
+                            "description": "responseDesc",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": dataType,
+                                        "items (if array)": {
+                                            "$ref": "#/components/schemas/dataType"
+                                        }
+                                    },
+                                    "example": {
+                                        "jsonExampleResponse"
+                                    }
+                                }
+                            }
+                        },
+                        "nextResponseCode": {
+
+                        }
+                    },
+                    "description": endpointDesc,
+                    "summary": endpointSummary
+                }
+            },
+        */
+
+        //Build tags array
+        /*
+        "tags": [
             {
-                endpoint.Path,
-
+                "name": tagName,
+                "description": tagDesc
             }
-            // paths = new
-            // {
-            //     [endpoint.Path] = new
-            //     {
-            //         [endpoint.Verb switch
-            //         {
-            //             0 => "get",
-            //             _ => "post"
-            //         }] = new
-            //         {
-            //             summary = endpoint.Summary ?? endpoint.Description,
-            //             description = endpoint.Description,
-            //             parameters: endpoint.Parameters?.Select(param => new
-            //             {
-            //                 name: param.ParamName,
-            //                 in: "path", // You might need to modify this based on the parameter location
-            //                 required: true, // You might need to modify this based on the parameter location
-            //                 schema: new { type = param.DataType.ToLowerInvariant() }
-            //             })?.ToList(),
-            //             responses: new
-            //             {
-            //                 [endpoint.Responses?.FirstOrDefault()?.ResponseCode ?? "default"] = new
-            //                 {
-            //                     description: endpoint.Responses?.FirstOrDefault()?.ResponseDesc ?? "Default response"
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
-        };
+        ],
+        */
+
+        //Build components (datatypes) section
+        /*
+        "components": {
+            "schemas": {
+                "dataTypeName": {
+                    "type": "dataType"
+                }
+            }
+        }
+        */
 
         return JsonConvert.SerializeObject(openApi, Formatting.Indented);
     }
