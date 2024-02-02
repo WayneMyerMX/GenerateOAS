@@ -2,18 +2,24 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations;
 
 public class OpenApiConverter
 {
-    public string ConvertToOpenApi(string json)
+    /// <summary>
+    /// Converts the lists of models and endpoints into OpenAPI JSON.
+    /// </summary>
+    /// <param name="endpoints"></param>
+    /// <param name="models"></param>
+    /// <returns></returns>
+    public string ConvertToOpenApi(List<Endpoint> endpoints, List<Model> models)
     {
-        var endpoint = JsonConvert.DeserializeObject<Endpoint>(json);
-        var openApi = new { openApi = "3.0"};
-        //Build OpenAPI intro block.
+        //Get the OpenAPI introduction blocks.
+        object introBlock = BuildOpenApiIntroBlock();
 
-        //Build OpenAPI server block.
+        //Get OpenAPI paths block.
 
-        //Build Open API paths block.
+
         //Iterate through list of Endpoints
         /*
          for each Endpoint
@@ -83,7 +89,34 @@ public class OpenApiConverter
 
         return JsonConvert.SerializeObject(openApi, Formatting.Indented);
     }
+
+    /// <summary>
+    /// Builds the OpenAPI, Info, and Servers blocks
+    /// </summary>
+    /// <returns>An anonymous object containing the intro block</returns>
+    public object BuildOpenApiIntroBlock()
+    {
+        //Create anonymous object as intro block.
+        //TODO: make these app.config values.
+        var intro = new
+            {
+                openapi = "3.0.0",
+                info = new {
+                    title = "Platform",
+                    description = "MX Platform OpenAPI",
+                    version = "1.0"
+                },
+                servers = new []
+                    {
+                        new {url = "http://api.mx.local:3000"}
+                    }
+            };
+
+        return intro;
+    }
 }
+
+
 
 public class ClassesToJsonConverter
 {
