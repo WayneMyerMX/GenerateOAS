@@ -1,4 +1,12 @@
+using System.Reflection.Metadata;
+using Newtonsoft.Json.Linq;
+
 public class Endpoint{
+    /// <summary>
+    /// Array of primitive data types for refining parameter schemas.
+    /// </summary>
+    public static string[] Primitives = {"array", "integer", "string", "double", "long", "short", "char", "number"};
+
     /// <summary>
     /// The name of the resource to which this endpoint belongs.
     /// </summary>
@@ -83,7 +91,72 @@ public class Endpoint{
         this.Tags       = new List<string>();
         this.Responses  = new List<Response>();
     }
+
+/// <summary>
+/// Converts an endpoint object into an OpenAPI JSON-serializable POCO.
+/// </summary>
+/// <returns>POCO that is serializable to OpenAPI JSON.</returns>
+    public object ConvertEndpointToSerializableObj()
+    {
+        //https://www.newtonsoft.com/json/help/html/CreateJsonDeclaratively.htm
+        // string path = """
+        // {
+        //     "path": {
+        //         "verb": {
+        //             "tags": [
+
+        //             ],
+        //         "parameters": [
+        //             {
+        //                 "name": "paramName",
+        //                 "description": "desc",
+        //                 "required": "isRequired",
+        //                 "in": "paramLoc",
+        //                 "schema": {
+        //                     "type": "dataTypeOrRef"
+        //                 }
+        //             }
+        //         ]
+        //         }
+        //     }
+        // }
+        // """;
+
+        //Build out list of parameters as a JArray.
+        List<JProperty> endPtParams = new List<JProperty>();
+
+        foreach(Parameter param in this.Parameters)
+        {
+            JObject paramJObj = new JObject(
+                new JProperty("name", param.ParamName),
+                new JProperty("description", param.Description),
+                new JProperty("required", param.IsRequired),
+                new JProperty("in", param.Location.ToString()),
+                new JProperty("schema",)
+            );
+        }
+
+
+
+
+        JObject jPath = new JObject(
+            new JProperty(this.Path,
+                new JProperty(this.Verb.ToString(),
+                    new JProperty("tags", new JArray(
+                        this.Tags.ToArray()
+                    ),
+                new JProperty("parameters", new JArray(
+
+                )))))
+
+        );
+        return new {
+
+        };
+    }
 }
+
+
 
 /// <summary>
 /// Holds the relevant values for a single endpoint paramter, including the name, datatype of the param, description of the param, and where the param is located in the request.
@@ -109,6 +182,10 @@ public class Parameter
     /// Where the parameter is located in the request.
     /// </summary>
     public ParamLocation Location {get;set;}
+    /// <summary>
+    /// Indicates whether this parameter is required to use this endpoint.
+    /// </summary>
+    public bool IsRequired{get; set;}
 
 }
 

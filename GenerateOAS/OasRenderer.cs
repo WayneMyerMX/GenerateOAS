@@ -114,6 +114,19 @@ public class OpenApiConverter
 
         return intro;
     }
+
+    /// <summary>
+    /// Converts a List of Endpoints into JSON-serializable anonymous objects.
+    /// </summary>
+    /// <param name="endpoints"></param>
+    /// <returns></returns>
+    public List<object> BuildOpenApiPathsBlock(List<Endpoint> endpoints)
+    {
+        List<object> serializableEndpoints = new List<object>();
+
+
+        return serializableEndpoints;
+    }
 }
 
 
