@@ -96,63 +96,44 @@ public class Endpoint{
 /// Converts an endpoint object into an OpenAPI JSON-serializable POCO.
 /// </summary>
 /// <returns>POCO that is serializable to OpenAPI JSON.</returns>
-    public object ConvertEndpointToSerializableObj()
+    public JObject ConvertEndpointToSerializableObj()
     {
         //https://www.newtonsoft.com/json/help/html/CreateJsonDeclaratively.htm
-        // string path = """
-        // {
-        //     "path": {
-        //         "verb": {
-        //             "tags": [
+        /*
 
-        //             ],
-        //         "parameters": [
-        //             {
-        //                 "name": "paramName",
-        //                 "description": "desc",
-        //                 "required": "isRequired",
-        //                 "in": "paramLoc",
-        //                 "schema": {
-        //                     "type": "dataTypeOrRef"
-        //                 }
-        //             }
-        //         ]
-        //         }
-        //     }
-        // }
-        // """;
+        */
 
         //Build out list of parameters as a JArray.
-        List<JProperty> endPtParams = new List<JProperty>();
+        List<JObject> endPtParams = new List<JObject>();
 
         foreach(Parameter param in this.Parameters)
         {
+            //Run through the list of endpoint parameters and build out name, description, required, in, and schema.
             JObject paramJObj = new JObject(
-                new JProperty("name", param.ParamName),
-                new JProperty("description", param.Description),
-                new JProperty("required", param.IsRequired),
-                new JProperty("in", param.Location.ToString()),
-                new JProperty("schema",)
+                new JProperty("name", param.ParamName)
+                ,new JProperty("description", param.Description)
+                ,new JProperty("required", param.IsRequired)
+                ,new JProperty("in", param.Location.ToString())
+                //,new JProperty("schema",)
             );
+
+            endPtParams.Add(paramJObj);
         }
 
+        //Build path object.
+        JObject jPathObj = new JObject(new JProperty(this.Path
+            ,new JObject(new JProperty(this.Verb.ToString()
+                //OperationID
+                ,new JObject(new JProperty("operationId", "opIdGoesHere"))
+                //Tags
+                ,new JObject(new JProperty("tags", new JArray(this.Tags.ToArray())))
+                //Parameters
+                ,new JObject(new JProperty("parameters", new JArray(endPtParams.ToArray())))
+                )
+            )
+        ));
 
-
-
-        JObject jPath = new JObject(
-            new JProperty(this.Path,
-                new JProperty(this.Verb.ToString(),
-                    new JProperty("tags", new JArray(
-                        this.Tags.ToArray()
-                    ),
-                new JProperty("parameters", new JArray(
-
-                )))))
-
-        );
-        return new {
-
-        };
+        return jPathObj;
     }
 }
 

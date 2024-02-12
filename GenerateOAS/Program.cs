@@ -43,7 +43,7 @@ internal partial class Program
         //Go through list of controller paths.
         ParseControllerDocs(_endpoints, controllerFiles);
 
-        string deleteMe = ClassesToJsonConverter.ConvertObjects(_endpoints);
+        string deleteMe = ClassesToJsonConverter.ConvertEndpoints(_endpoints);
         Console.WriteLine(deleteMe);
     }
 
