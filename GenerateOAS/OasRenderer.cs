@@ -145,8 +145,7 @@ public class ClassesToJsonConverter
 
         foreach(var ep in endpoints)
         {
-           JObject jObj = ep.ConvertEndpointToSerializableObj();
-           sbJson.AppendLine(JsonConvert.SerializeObject(jObj, Formatting.Indented));
+           sbJson.AppendLine(ep.ConvertEndpointToSerializableObj());
         }
 
         return sbJson.ToString();

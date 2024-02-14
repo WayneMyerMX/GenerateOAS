@@ -1,4 +1,6 @@
 using System.Reflection.Metadata;
+using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 public class Endpoint{
@@ -96,13 +98,8 @@ public class Endpoint{
 /// Converts an endpoint object into an OpenAPI JSON-serializable POCO.
 /// </summary>
 /// <returns>POCO that is serializable to OpenAPI JSON.</returns>
-    public JObject ConvertEndpointToSerializableObj()
+    public string ConvertEndpointToSerializableObj()
     {
-        //https://www.newtonsoft.com/json/help/html/CreateJsonDeclaratively.htm
-        /*
-
-        */
-
         //Build out list of parameters as a JArray.
         List<JObject> endPtParams = new List<JObject>();
 
@@ -120,20 +117,27 @@ public class Endpoint{
             endPtParams.Add(paramJObj);
         }
 
-        //Build path object.
-        JObject jPathObj = new JObject(new JProperty(this.Path
-            ,new JObject(new JProperty(this.Verb.ToString()
-                //OperationID
-                ,new JObject(new JProperty("operationId", "opIdGoesHere"))
-                //Tags
-                ,new JObject(new JProperty("tags", new JArray(this.Tags.ToArray())))
-                //Parameters
-                ,new JObject(new JProperty("parameters", new JArray(endPtParams.ToArray())))
-                )
-            )
-        ));
+        JObject test = JObject.FromObject(new
+            {
+                epPath = new {
+                    epVerb = new {
+                        tags = new JArray(this.Tags.ToArray()),
+                        operationId = this.OperationId,
+                        parameters = new JArray(endPtParams.ToArray()),
+                        responses = "responses here",
+                        description = this.Description,
+                        summary = this.Summary
+                    }
+                }
+            }
+        );
 
-        return jPathObj;
+        StringBuilder sb = new StringBuilder(JsonConvert.SerializeObject(test, Formatting.Indented));
+
+        sb.Replace("epPath", this.Path);
+        sb.Replace("epVerb", this.Verb.ToString().ToLower());
+
+        return sb.ToString();
     }
 }
 
