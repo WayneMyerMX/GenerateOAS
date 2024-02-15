@@ -98,42 +98,117 @@ public class Endpoint{
 /// Converts an endpoint object into an OpenAPI JSON-serializable POCO.
 /// </summary>
 /// <returns>POCO that is serializable to OpenAPI JSON.</returns>
-    public string ConvertEndpointToSerializableObj()
+    public string ConvertEndpointToSerializeString()
     {
         //Build out list of parameters as a JArray.
         List<JObject> endPtParams = new List<JObject>();
 
+        //Run through the list of endpoint parameters and build out name, description, required, in, and schema.
         foreach(Parameter param in this.Parameters)
         {
-            //Run through the list of endpoint parameters and build out name, description, required, in, and schema.
             JObject paramJObj = new JObject(
                 new JProperty("name", param.ParamName)
                 ,new JProperty("description", param.Description)
                 ,new JProperty("required", param.IsRequired)
                 ,new JProperty("in", param.Location.ToString())
-                //,new JProperty("schema",)
+                ,new JProperty("schema",
+                    new JObject(new JProperty("type", param.DataType.ToString())))
             );
 
             endPtParams.Add(paramJObj);
         }
 
-        JObject test = JObject.FromObject(new
+        //Build out the responses object.
+        foreach(Response r in this.Responses)
+        {
+            string respdesc;
+
+            //204 responses are empty and structurally different from other responses.
+            if(r.ResponseCode == "204")
+            {
+                respdesc = r.ResponseDesc;
+            }
+
+
+            if(this.Responses.Count > 0)
+            {
+                respdesc = string.IsNullOrEmpty(this.Responses[0].ResponseDesc) ? string.Empty : this.Responses[0].ResponseDesc;
+            }
+            else
+            {
+                respdesc = string.Empty;
+            }
+
+            JObject response1 = new JObject(
+                new JProperty("default", new JObject(
+                    new JProperty("description", "responsedesc")
+                    ,new JProperty("content", new JObject(
+                        new JProperty("application/json", new JObject(
+                            new JProperty("schema", new JObject(
+                                new JProperty("$ref", "link to datatype")
+                            ))
+                        ))
+                    ))
+                ))
+            );
+        }
+
+
+
+
+        // JObject response1 = new JObject(
+        //     new JProperty("default",
+        //         new JObject(new JProperty("description", respdesc))
+        //         ,new JProperty("content"
+        //             ,new JObject(new JProperty("content", "contentObj")))
+        //         //  ,new JObject(
+        //         //     new JProperty("application/json", new JObject(
+        //         //         new JProperty("schema", new JObject(
+        //         //             new JProperty("ref/schema", "#components/schema/Tag")
+        //         //             )
+        //         //         )
+        //         //     ))
+        //         // ))
+        //     )
+        // );
+        /*
+        "responses": {
+            "default": {
+                "description": "",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            primitive or $ref
+                        }
+                    }
+                }
+            }
+        },
+        [response code]: {
+            "description": response description
+        }
+        */
+
+        //Build out the endpoint template.
+        JObject endpoint = JObject.FromObject(new
             {
                 epPath = new {
                     epVerb = new {
-                        tags = new JArray(this.Tags.ToArray()),
-                        operationId = this.OperationId,
-                        parameters = new JArray(endPtParams.ToArray()),
-                        responses = "responses here",
-                        description = this.Description,
-                        summary = this.Summary
+                        tags = new JArray(this.Tags.ToArray())
+                        ,operationId = string.IsNullOrEmpty(this.OperationId) ? string.Empty : this.OperationId
+                        ,parameters = new JArray(endPtParams.ToArray())
+                        ,responses = "responses here"
+                        ,description = this.Description
+                        ,summary = string.IsNullOrEmpty(this.Summary) ? string.Empty : this.Summary
                     }
                 }
             }
         );
 
-        StringBuilder sb = new StringBuilder(JsonConvert.SerializeObject(test, Formatting.Indented));
+        //Serialize the endpoint template.
+        StringBuilder sb = new StringBuilder(JsonConvert.SerializeObject(endpoint, Formatting.Indented));
 
+        //Replace the path and verb, which can't be done with the anonymous object above.
         sb.Replace("epPath", this.Path);
         sb.Replace("epVerb", this.Verb.ToString().ToLower());
 

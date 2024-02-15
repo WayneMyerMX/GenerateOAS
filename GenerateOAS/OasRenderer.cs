@@ -20,7 +20,7 @@ public class OpenApiConverter
         //Get OpenAPI paths block.
         foreach(var endpoint in endpoints)
         {
-            object serializableObj = endpoint.ConvertEndpointToSerializableObj;
+            object serializableObj = endpoint.ConvertEndpointToSerializeString;
         }
 
         //Iterate through list of Endpoints
@@ -145,7 +145,7 @@ public class ClassesToJsonConverter
 
         foreach(var ep in endpoints)
         {
-           sbJson.AppendLine(ep.ConvertEndpointToSerializableObj());
+           sbJson.AppendLine(ep.ConvertEndpointToSerializeString());
         }
 
         return sbJson.ToString();
