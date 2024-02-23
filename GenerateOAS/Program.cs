@@ -1,5 +1,7 @@
 ﻿using System.Data;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 internal partial class Program
 {
@@ -45,6 +47,11 @@ internal partial class Program
 
         string deleteMe = ClassesToJsonConverter.ConvertEndpoints(_endpoints);
         Console.WriteLine(deleteMe);
+
+        StreamReader sr = new StreamReader(@"../GenerateOAS/DocumentObjects/openapi.json");
+        string oasString = sr.ReadToEnd();
+        JsonTextReader jsonTextReader = new JsonTextReader(sr);
+        JObject oasObj = JObject.Parse(oasString);
     }
 
     /// <summary>

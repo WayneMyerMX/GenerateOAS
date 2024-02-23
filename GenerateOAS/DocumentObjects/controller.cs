@@ -106,6 +106,7 @@ public class Endpoint{
         //Run through the list of endpoint parameters and build out name, description, required, in, and schema.
         foreach(Parameter param in this.Parameters)
         {
+            //Create parameters object.
             JObject paramJObj = new JObject(
                 new JProperty("name", param.ParamName)
                 ,new JProperty("description", param.Description)
@@ -118,77 +119,45 @@ public class Endpoint{
             endPtParams.Add(paramJObj);
         }
 
-        //Build out the responses object.
+        //Build out the responses list.
+        List<JObject> jsonResponsesList = new List<JObject>();
+
         foreach(Response r in this.Responses)
         {
             string respdesc;
+            JObject formattedResponse = new JObject();
 
-            //204 responses are empty and structurally different from other responses.
+            //204 responses are structurally different from other responses.
             if(r.ResponseCode == "204")
             {
                 respdesc = r.ResponseDesc;
+                formattedResponse = new JObject(
+                    new JProperty(r.ResponseCode, new JObject(
+                        new JProperty("description", respdesc)
+                        )
+                    )
+                );
+                jsonResponsesList.Add(formattedResponse);
+                continue;
             }
 
-
-            if(this.Responses.Count > 0)
-            {
-                respdesc = string.IsNullOrEmpty(this.Responses[0].ResponseDesc) ? string.Empty : this.Responses[0].ResponseDesc;
-            }
-            else
-            {
-                respdesc = string.Empty;
-            }
-
-            JObject response1 = new JObject(
-                new JProperty("default", new JObject(
-                    new JProperty("description", "responsedesc")
-                    ,new JProperty("content", new JObject(
-                        new JProperty("application/json", new JObject(
-                            new JProperty("schema", new JObject(
-                                new JProperty("$ref", "link to datatype")
-                            ))
+            respdesc = string.IsNullOrEmpty(this.Responses[0].ResponseDesc) ? string.Empty : this.Responses[0].ResponseDesc;
+            formattedResponse = new JObject(
+            new JProperty(r.ResponseCode, new JObject(
+                new JProperty("description", r.ResponseDesc)
+                ,new JProperty("content", new JObject(
+                    new JProperty("application/json", new JObject(
+                        new JProperty("schema", new JObject(
+                            new JProperty("$ref", "link to datatype")
                         ))
                     ))
                 ))
+            ))
             );
+            jsonResponsesList.Add(formattedResponse);
         }
 
-
-
-
-        // JObject response1 = new JObject(
-        //     new JProperty("default",
-        //         new JObject(new JProperty("description", respdesc))
-        //         ,new JProperty("content"
-        //             ,new JObject(new JProperty("content", "contentObj")))
-        //         //  ,new JObject(
-        //         //     new JProperty("application/json", new JObject(
-        //         //         new JProperty("schema", new JObject(
-        //         //             new JProperty("ref/schema", "#components/schema/Tag")
-        //         //             )
-        //         //         )
-        //         //     ))
-        //         // ))
-        //     )
-        // );
-        /*
-        "responses": {
-            "default": {
-                "description": "",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            primitive or $ref
-                        }
-                    }
-                }
-            }
-        },
-        [response code]: {
-            "description": response description
-        }
-        */
-
+        //TODO: prevent the responses from being parsed as an array
         //Build out the endpoint template.
         JObject endpoint = JObject.FromObject(new
             {
@@ -197,7 +166,7 @@ public class Endpoint{
                         tags = new JArray(this.Tags.ToArray())
                         ,operationId = string.IsNullOrEmpty(this.OperationId) ? string.Empty : this.OperationId
                         ,parameters = new JArray(endPtParams.ToArray())
-                        ,responses = "responses here"
+                        ,responses = jsonResponsesList
                         ,description = this.Description
                         ,summary = string.IsNullOrEmpty(this.Summary) ? string.Empty : this.Summary
                     }

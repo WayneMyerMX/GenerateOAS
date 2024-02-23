@@ -6,92 +6,92 @@ using System.ComponentModel.DataAnnotations;
 
 public class OpenApiConverter
 {
-    /// <summary>
-    /// Converts the lists of models and endpoints into OpenAPI JSON.
-    /// </summary>
-    /// <param name="endpoints"></param>
-    /// <param name="models"></param>
-    /// <returns></returns>
-    public string ConvertToOpenApi(List<Endpoint> endpoints, List<Model> models)
+    //Build the full OpenAPI JObject
+    public JObject BuildOpenApi(List<Endpoint> endpoints, List<Model> models)
     {
-        //Get the OpenAPI introduction blocks.
-        object introBlock = BuildOpenApiIntroBlock();
+        //There be dragons here. Modify at your own great risk.
+        JObject oas = new JObject(
+            //OpenAPI intro block
+            new JProperty("openapi", "3.0.0")
+            ,new JProperty("info", new JObject(
+                new JProperty("title", "Platform")
+                ,new JProperty("description", "Mx Platform OpenAPI Spec")
+                ,new JProperty("version", "1.0")
+            ))
+            //Servers
+            ,new JProperty("servers", new JArray{
+                new JObject(new JProperty("url", "http://api.mx.local:3000"))
+            })
+            //Paths
+            ,new JProperty("paths", new JObject(
+                new JProperty("endpoint path 1", new JObject(
+                    new JProperty("endpoint verb", new JObject(
+                        new JProperty("tags", new JArray{
+                            "endpoint tags like Holdings",
+                            "another endpoint tag"
+                        })
+                        ,new JProperty("operationId", "operationId here")
+                        ,new JProperty("parameters", new JArray{
+                            new JObject(new JProperty("name", "paramName")
+                                        ,new JProperty("description", "param description")
+                                        ,new JProperty("required", "isRequired")
+                                        ,new JProperty("in", "paramLocation")
+                                        ,new JProperty("schema", new JObject(
+                                            new JProperty("type", "dataType")
+                                        )))
+                        })
+                        ,new JProperty("responses", new JObject(
+                            new JProperty("responseCode", new JObject(
+                                new JProperty("description", "response description")
+                                ,new JProperty("content", new JObject(
+                                    new JProperty("response content type (application/json)", new JObject(
+                                        new JProperty("schema", new JObject(
+                                            new JProperty("type", "array")
+                                            ,new JProperty("items", new JObject(
+                                                new JProperty("$ref", "#/components/Holding")
+                                            ))
+                                        ))
+                                        ,new JProperty("example", new JObject(
+                                            new JProperty("example, like HoldingsResponse", "example string literal of JSON response")
+                                        ))
+                                    ))
+                                ))
+                            ))
+                            ,new JProperty("nextResponseCode", "more response code objects")
+                        ))
+                    ))
+                ))
+            ))
+            //Tags array
+            ,new JProperty("tags", new JArray{
+                new JObject(new JProperty("name", "tagName1")
+                            ,new JProperty("description", "tag description 1"))
+                ,new JObject(new JProperty("name", "tagName2")
+                            ,new JProperty("description", "tag description 2"))
+            })
+            //Components (complex datatypes)
+            ,new JProperty("components", new JObject(
+                new JProperty("schemas", new JObject(
+                    new JProperty("complexDataType 1", new JObject(
+                        new JProperty("type", "object")
+                        ,new JProperty("properties", new JObject(
+                            new JProperty("component datatype name 1 (like 'guid')", new JObject(
+                                new JProperty("type", "string/datatype")
+                                ,new JProperty("example", "string literal example")
+                            ))
+                            ,new JProperty("component datatype 2(like 'value')", new JObject(
+                                new JProperty("type", "string")
+                                ,new JProperty("example", "string literal example")
+                            ))
+                        ))
+                    ))
 
-        //Get OpenAPI paths block.
-        foreach(var endpoint in endpoints)
-        {
-            object serializableObj = endpoint.ConvertEndpointToSerializeString;
-        }
+                ))
+            ))
 
-        //Iterate through list of Endpoints
-        /*
-         for each Endpoint
-            "[path]" :{
-                "[verb]": {
-                    "tags": [
-                        list of tags
-                    ],
-                    "parameters": [
-                        {
-                            "name": paramName,
-                            "description": desc,
-                            "required": isRequired,
-                            "in": paramLoc,
-                            "schema": {
-                                "type": dataTypeOrRef
-                            }
-                        }
-                    ],
-                    "responses": {
-                        "responseCode": {
-                            "description": "responseDesc",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": dataType,
-                                        "items (if array)": {
-                                            "$ref": "#/components/schemas/dataType"
-                                        }
-                                    },
-                                    "example": {
-                                        "jsonExampleResponse"
-                                    }
-                                }
-                            }
-                        },
-                        "nextResponseCode": {
+        );
 
-                        }
-                    },
-                    "description": endpointDesc,
-                    "summary": endpointSummary
-                }
-            },
-        */
-
-        //Build tags array
-        /*
-        "tags": [
-            {
-                "name": tagName,
-                "description": tagDesc
-            }
-        ],
-        */
-
-        //Build components (datatypes) section
-        /*
-        "components": {
-            "schemas": {
-                "dataTypeName": {
-                    "type": "dataType"
-                }
-            }
-        }
-        */
-
-        //return JsonConvert.SerializeObject(openApi, Formatting.Indented);
-        return "";
+        return oas;
     }
 
     /// <summary>
@@ -118,8 +118,6 @@ public class OpenApiConverter
 
         return intro;
     }
-
-
 }
 
 
