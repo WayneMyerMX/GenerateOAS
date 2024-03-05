@@ -9,6 +9,17 @@ public class OpenApiConverter
     //Build the full OpenAPI JObject
     public JObject BuildOpenApi(List<Endpoint> endpoints, List<Model> models)
     {
+        /*
+            does this path occur more than once?
+            find other paths
+            same path
+            build verbs for the path
+
+        */
+
+        var testing =
+            endpoints.GroupBy(ep => ep.Path);
+
         //There be dragons here. Modify at your own great risk.
         JObject oas = new JObject(
             //OpenAPI intro block
