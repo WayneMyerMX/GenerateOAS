@@ -339,5 +339,57 @@ public class CompoundEndpoint
         }
     }
 
+    /// <summary>
+    /// Returns an list of endpoints, grouped by common path.
+    /// </summary>
+    /// <param name="endpoints"></param>
+    /// <returns></returns>
+    public static List<CompoundEndpoint> AggregateEndpointsByPath(List<Endpoint> endpoints)
+        {
+            var aggdEndpoints = new List<CompoundEndpoint>();
 
+            //Yes, there is a more elegant way to build this with LINQ, but I want to keep this easier for other people to pick up.
+            //Build an array of all the paths.
+            var paths = endpoints.Select(ep => ep.Path).Distinct().ToArray();
+
+            //For each path, build out a compound endpoint.
+            foreach(string p in paths)
+            {
+                CompoundEndpoint cep = new CompoundEndpoint{Path = p};
+                var matchingEndpoints = endpoints.Where(ep=>ep.Path.Equals(p));
+                                        // from e in endpoints
+                                        // where e.Path.Equals(p)
+                                        // select e;
+                //From the matching endpoints, fill out the compound endpoint.
+                foreach(Endpoint match in matchingEndpoints)
+                {
+                    cep.Resource     = match.Resource;
+                    cep.ResourceDesc = match.ResourceDesc;
+
+                    //Build the individual descriptor, i.e. the individual endpoint.
+                    var descriptor = new EndpointDescriptors
+                    {
+                        Name            = match.Name,
+                        Description     = match.Description,
+                        Summary         = match.Summary,
+                        Parameters      = match.Parameters,
+                        Tags            = match.Tags,
+                        Verb            = match.Verb,
+                        ExampleRequest  = match.ExampleRequest,
+                        ExampleResponse = match.ExampleResponse,
+                        Version         = match.Version,
+                        Responses       = match.Responses,
+                        ResponseDataType = match.ResponseDataType,
+                        OperationId     = match.OperationId
+                    };
+                    cep.endpointDescriptors.Add(descriptor);
+                }
+
+                aggdEndpoints.Add(cep);
+            }
+
+            //Load parameters, examples, and properties into an endpoint descriptor object
+
+            return aggdEndpoints;
+        }
 }

@@ -52,6 +52,7 @@ internal partial class Program
         string oasString = sr.ReadToEnd();
         JsonTextReader jsonTextReader = new JsonTextReader(sr);
         JObject oasObj = JObject.Parse(oasString);
+        CompoundEndpoint.AggregateEndpointsByPath(_endpoints);
     }
 
     /// <summary>
@@ -185,6 +186,170 @@ internal partial class Program
                 controllerIndex = ParseControllerEndpoints(_endpoints, resource, resourceDesc, controllerLines, controllerIndex);
             }
         }
+    }
+
+    //Attempt to put endpoints together under unified path
+    private static int ParseControllerEndpointsAsUnifiedPath(List<Endpoint> _endpoints, StringBuilder resource, StringBuilder resourceDesc, List<string> controllerLines, int controllerIndex)
+    {
+        for (; controllerIndex < controllerLines.Count; controllerIndex++)
+        {
+            //Advance the index until a SWAGGER_KEY, path, and end of endpoint block are found.
+            while (controllerIndex < controllerLines.Count && !controllerLines[controllerIndex].Contains('#'))
+            {
+                controllerIndex++;
+            }
+
+            //Look for endpoint docs syntax blocks.
+            List<string> endpointRawBlock = new List<string>();
+
+            while (controllerIndex < controllerLines.Count && controllerLines[controllerIndex].Contains('#'))
+            {
+                endpointRawBlock.Add(controllerLines[controllerIndex]);
+                controllerIndex++;
+            }
+
+            //Does the endpoint block contain @path?  Yes, it's an endpoint docs block.
+            if (endpointRawBlock.Any(p => p.Contains(PATH)))
+            {
+                Endpoint endpoint = new Endpoint();
+
+                //Assemble the endpoint docs that are in this raw block.
+                //Format is:
+                //##
+                //# description text (can be multiline)
+                //# @path verb /pathName
+                //# @parameter (location: body | path | query) [dataType] parameterDescription (can be multiline)
+                //# @example_request
+                //#     example request text
+                //# @response_type [responseDataType]
+                //# @response 200 200ResponseText
+                //# @response 500 500ResponseText
+                //# @example_response
+                //#     example response text
+
+                //Assign resource name and resource description.
+                endpoint.Resource = resource.ToString();
+                endpoint.ResourceDesc = resourceDesc.ToString();
+                int pathIndex = endpointRawBlock.FindIndex(path => path.Contains(PATH));
+
+                //Parse the HTTP verb.
+                endpoint.Verb = (Verbs)Enum.Parse(typeof(Verbs), endpointRawBlock[pathIndex].Split('[').Last().Split(']').First());
+
+                //Parse the endpoint path.
+                endpoint.Path = endpointRawBlock[pathIndex].Split(']').Last().Trim();
+
+                //Parse description text (every line between index = 1 and pathIndex).
+                StringBuilder description = new StringBuilder();
+                for (int d = 1; d < pathIndex; d++)
+                {
+                    string descLine = endpointRawBlock[d].Split('#').Last().Trim();
+
+                    if (descLine.Length > 0)
+                    {
+                        description.AppendLine(descLine);
+                    }
+                }
+
+                endpoint.Description = description.ToString();
+
+                //Parse parameters.
+                //Find the first and last parameter.
+                int firstParamIndex = endpointRawBlock.FindIndex(param => param.Contains(PARAM));
+                int lastParamIndex = endpointRawBlock.FindLastIndex(param => param.Contains(PARAM));
+
+                for (int pIdx = firstParamIndex; pIdx <= lastParamIndex && pIdx > 0; pIdx++)
+                {
+                    string paramLine = endpointRawBlock[pIdx];
+                    Parameter parameter = new Parameter();
+
+                    //Split the string after "parameter".
+                    //Everything up to '(' is param name.
+                    parameter.ParamName = paramLine.Split(PARAM).Last().Split('(').First().Trim();
+
+                    //Get param location (in parens).
+                    parameter.Location = (ParamLocation)Enum.Parse(typeof(ParamLocation), paramLine.Split('(')
+                        .Last()
+                        .Split(')')
+                        .First()
+                        .Trim());
+
+                    //Get param data type (in []).
+                    //TODO: Warn if data type is missing in this line.
+                    parameter.DataType = paramLine.Split('[').Last().Split(']').First().Trim();
+
+                    //Get param description (can be multiline).
+                    StringBuilder sbParaDesc = new StringBuilder();
+                    sbParaDesc.Append(paramLine.Split(']').Last().Trim());
+                    int paramBlockIdx = 1;
+                    while (pIdx + 1 < lastParamIndex && !endpointRawBlock[pIdx + paramBlockIdx].Contains(PARAM))
+                    {
+                        sbParaDesc.AppendLine(endpointRawBlock[pIdx + paramBlockIdx].Split('#').Last().Trim());
+                        paramBlockIdx++;
+                    }
+                    parameter.Description = sbParaDesc.ToString();
+                    endpoint.Parameters.Add(parameter);
+                    //Move to the next parameter.
+                }
+
+                //Endpoints can return multiple resonse codes. Parse responses docs for this endpoint.
+                int firstRespIndex = endpointRawBlock.FindIndex(resp => resp.Contains(RESPONSE));
+                int lastRespIndex = endpointRawBlock.FindLastIndex(resp => resp.Contains(RESPONSE));
+
+                for (int respIdx = firstRespIndex; respIdx <= lastRespIndex && respIdx > 0; respIdx++)
+                {
+                    Response response = new Response();
+                    string respLine = endpointRawBlock[respIdx];
+                    string responseCode = respLine.Split(RESPONSE).Last().Trim().Split(' ').First().Trim();
+                    string responseDesc = respLine.Split(responseCode).Last().Trim();
+                    response.ResponseCode = responseCode;
+                    response.ResponseDesc = responseDesc;
+                    endpoint.Responses.Add(response);
+                }
+
+                //Parse response_type for this endpoint.
+                //TODO: some Platform endpoints can return multiple datatypes. That is probably best handled by
+                //an additional documentation block.
+                if(endpointRawBlock.Any(rType => rType.Contains(RESPONSE_TYPE)))
+                {
+                    string respTypeLine = endpointRawBlock[endpointRawBlock.FindIndex(respType => respType.Contains(RESPONSE_TYPE))];
+                    string respType = respTypeLine.Split('[').Last().Trim('[').Trim(']').Trim();
+                    endpoint.ResponseDataType = respType;
+                }
+
+                //Parse example request for this endpoint.
+                int exampleReqIdx = endpointRawBlock.FindIndex(exReq => exReq.Contains(EXAMPLE_REQ));
+
+                if(exampleReqIdx > 1)
+                {
+                    //The next line is the JSON of the example request.
+                    endpoint.ExampleRequest = endpointRawBlock[exampleReqIdx + 1];
+                }
+
+                //Parse example response for this endpoint. Disambiguate between @example and @example_request.
+                int exampleRespIdx = endpointRawBlock.FindIndex(exResp => exResp.Contains(EXAMPLE) && !exResp.Contains(EXAMPLE_REQ));
+
+                if(exampleRespIdx > 1)
+                {
+                    //The next line is the JSON of the example response.
+                    endpoint.ExampleResponse = endpointRawBlock[exampleRespIdx + 1].Trim().Trim('#').Trim();
+                }
+
+                //Parse OperationId for the endpoint, if present.
+                int operationIdIdx = endpointRawBlock.FindIndex(opId => opId.Contains(OPERATION_ID));
+
+                if(operationIdIdx > 1)
+                {
+                    //This line is the operation_id. Save to endpoint.OperationId.
+                    endpoint.OperationId = endpointRawBlock[operationIdIdx].Split(OPERATION_ID).Last().Trim();
+                }
+
+                //Finshed parsing this endpoint. Save the object, clear the controllerLines list.
+                _endpoints.Add(endpoint);
+            }
+        }
+
+
+        return controllerIndex;
     }
 
     /// <summary>
