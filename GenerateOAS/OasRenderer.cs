@@ -6,6 +6,31 @@ using System.ComponentModel.DataAnnotations;
 
 public class OpenApiConverter
 {
+    private const string OPENAPI        = "openapi";
+    private const string INFO           = "info";
+    private const string TITLE          = "title";
+    private const string DESCRIPTION    = "description";
+    private const string VERSION        = "version";
+    private const string SERVERS        = "servers";
+    private const string URL            = "url";
+    private const string PATHS          = "paths";
+    private const string TAGS           = "tags";
+    private const string OP_ID          = "operationId";
+    private const string PARAMETERS     = "parameters";
+    private const string NAME           = "name";
+    private const string REQUIRED       = "required";
+    private const string IN             = "in";
+    private const string SCHEMA         = "schema";
+    private const string SCHEMAS        = "schemas";
+    private const string TYPE           = "type";
+    private const string RESPONSES      = "responses";
+    private const string RESP_CODE      = "responseCode";
+    private const string CONTENT        = "content";
+    private const string ITEMS          = "items";
+    private const string EXAMPLE        = "example";
+    private const string COMPONENTS     = "components";
+    private const string PROPERTIES     = "properties";
+
     //Build the full OpenAPI JObject
     public JObject BuildOpenApi(List<Endpoint> endpoints, List<Model> models)
     {
@@ -13,46 +38,46 @@ public class OpenApiConverter
         //There be dragons here. Modify at your own great risk.
         JObject oas = new JObject(
             //OpenAPI intro block
-            new JProperty("openapi", "3.0.0")
-            ,new JProperty("info", new JObject(
-                new JProperty("title", "Platform")
-                ,new JProperty("description", "Mx Platform OpenAPI Spec")
-                ,new JProperty("version", "1.0")
+            new JProperty(OPENAPI, "3.0.0")
+            ,new JProperty(INFO, new JObject(
+                new JProperty(TITLE, "Platform")
+                ,new JProperty(DESCRIPTION, "MX Platform OpenAPI Spec")
+                ,new JProperty(VERSION, "1.0")
             ))
             //Servers
-            ,new JProperty("servers", new JArray{
-                new JObject(new JProperty("url", "http://api.mx.local:3000"))
+            ,new JProperty(SERVERS, new JArray{
+                new JObject(new JProperty(URL, "http://api.mx.local:3000"))
             })
             //Paths
-            ,new JProperty("paths", new JObject(
+            ,new JProperty(PATHS, new JObject(
                 new JProperty("endpoint path 1", new JObject(
                     new JProperty("endpoint verb", new JObject(
-                        new JProperty("tags", new JArray{
+                        new JProperty(TAGS, new JArray{
                             "endpoint tags like Holdings",
                             "another endpoint tag"
                         })
-                        ,new JProperty("operationId", "operationId here")
-                        ,new JProperty("parameters", new JArray{
-                            new JObject(new JProperty("name", "paramName")
-                                        ,new JProperty("description", "param description")
-                                        ,new JProperty("required", "isRequired")
-                                        ,new JProperty("in", "paramLocation")
-                                        ,new JProperty("schema", new JObject(
-                                            new JProperty("type", "dataType")
+                        ,new JProperty(OP_ID, "operationId here")
+                        ,new JProperty(PARAMETERS, new JArray{
+                            new JObject(new JProperty(NAME, "paramName")
+                                        ,new JProperty(DESCRIPTION, "param description")
+                                        ,new JProperty(REQUIRED, "isRequired")
+                                        ,new JProperty(IN, "paramLocation")
+                                        ,new JProperty(SCHEMA, new JObject(
+                                            new JProperty(TYPE, "dataType")
                                         )))
                         })
-                        ,new JProperty("responses", new JObject(
-                            new JProperty("responseCode", new JObject(
-                                new JProperty("description", "response description")
-                                ,new JProperty("content", new JObject(
+                        ,new JProperty(RESPONSES, new JObject(
+                            new JProperty(RESP_CODE, new JObject(
+                                new JProperty(DESCRIPTION, "response description")
+                                ,new JProperty(CONTENT, new JObject(
                                     new JProperty("response content type (application/json)", new JObject(
-                                        new JProperty("schema", new JObject(
-                                            new JProperty("type", "array")
-                                            ,new JProperty("items", new JObject(
+                                        new JProperty(SCHEMA, new JObject(
+                                            new JProperty(TYPE, "array")
+                                            ,new JProperty(ITEMS, new JObject(
                                                 new JProperty("$ref", "#/components/Holding")
                                             ))
                                         ))
-                                        ,new JProperty("example", new JObject(
+                                        ,new JProperty(EXAMPLE, new JObject(
                                             new JProperty("example, like HoldingsResponse", "example string literal of JSON response")
                                         ))
                                     ))
@@ -64,25 +89,25 @@ public class OpenApiConverter
                 ))
             ))
             //Tags array
-            ,new JProperty("tags", new JArray{
-                new JObject(new JProperty("name", "tagName1")
-                            ,new JProperty("description", "tag description 1"))
-                ,new JObject(new JProperty("name", "tagName2")
-                            ,new JProperty("description", "tag description 2"))
+            ,new JProperty(TAGS, new JArray{
+                new JObject(new JProperty(NAME, "tagName1")
+                            ,new JProperty(DESCRIPTION, "tag description 1"))
+                ,new JObject(new JProperty(NAME, "tagName2")
+                            ,new JProperty(DESCRIPTION, "tag description 2"))
             })
             //Components (complex datatypes)
-            ,new JProperty("components", new JObject(
-                new JProperty("schemas", new JObject(
+            ,new JProperty(COMPONENTS, new JObject(
+                new JProperty(SCHEMAS, new JObject(
                     new JProperty("complexDataType 1", new JObject(
-                        new JProperty("type", "object")
-                        ,new JProperty("properties", new JObject(
+                        new JProperty(TYPE, "object")
+                        ,new JProperty(PROPERTIES, new JObject(
                             new JProperty("component datatype name 1 (like 'guid')", new JObject(
-                                new JProperty("type", "string/datatype")
-                                ,new JProperty("example", "string literal example")
+                                new JProperty(TYPE, "string/datatype")
+                                ,new JProperty(EXAMPLE, "string literal example")
                             ))
                             ,new JProperty("component datatype 2(like 'value')", new JObject(
-                                new JProperty("type", "string")
-                                ,new JProperty("example", "string literal example")
+                                new JProperty(TYPE, "string")
+                                ,new JProperty(EXAMPLE, "string literal example")
                             ))
                         ))
                     ))
