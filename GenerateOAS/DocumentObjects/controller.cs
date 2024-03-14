@@ -357,9 +357,7 @@ public class CompoundEndpoint
             {
                 CompoundEndpoint cep = new CompoundEndpoint{Path = p};
                 var matchingEndpoints = endpoints.Where(ep=>ep.Path.Equals(p));
-                                        // from e in endpoints
-                                        // where e.Path.Equals(p)
-                                        // select e;
+
                 //From the matching endpoints, fill out the compound endpoint.
                 foreach(Endpoint match in matchingEndpoints)
                 {

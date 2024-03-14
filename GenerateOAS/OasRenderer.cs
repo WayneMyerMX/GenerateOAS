@@ -32,10 +32,9 @@ public class OpenApiConverter
     private const string PROPERTIES     = "properties";
 
     //Build the full OpenAPI JObject
-    public JObject BuildOpenApi(List<Endpoint> endpoints, List<Model> models)
+    public static JObject BuildOpenApi(List<CompoundEndpoint> endpoints, List<Model> models)
     {
-
-        //There be dragons here. Modify at your own great risk.
+        //Seriously, here there be dragons. Modify at your own great risk.
         JObject oas = new JObject(
             //OpenAPI intro block
             new JProperty(OPENAPI, "3.0.0")
@@ -50,7 +49,32 @@ public class OpenApiConverter
             })
             //Paths
             ,new JProperty(PATHS, new JObject(
-                new JProperty("endpoint path 1", new JObject(
+                from ep in endpoints
+                select new JProperty(ep.Path, new JObject(
+                    from epdesc in ep.endpointDescriptors
+                    select new JProperty(epdesc.Verb.ToString().ToLower(), new JObject(
+                        new JProperty(TAGS, new JArray(
+                            from tags in epdesc.Tags
+                            select new JValue(tags)
+                        ))
+                        ,new JProperty(OP_ID, new JValue(epdesc.OperationId))
+                        ,new JProperty(PARAMETERS, new JArray(
+                            from epParam in epdesc.Parameters
+                            select new JObject(
+                                new JProperty(NAME, epParam.ParamName)
+                                ,new JProperty(DESCRIPTION, epParam.Description)
+                                ,new JProperty(REQUIRED, epParam.IsRequired)
+                                ,new JProperty(IN, epParam.Location.ToString().ToLower())
+                                ,new JProperty(SCHEMA, new JObject(
+                                    new JProperty(TYPE, epParam.DataType)
+                                )))
+                        ))
+                        //,new JProperty(RESPONSES, )
+                    ))
+                    )
+                )
+
+                ,new JProperty("endpoint path 1", new JObject(
                     new JProperty("endpoint verb", new JObject(
                         new JProperty(TAGS, new JArray{
                             "endpoint tags like Holdings",
@@ -116,6 +140,88 @@ public class OpenApiConverter
             ))
 
         );
+
+        //There be dragons here. Modify at your own great risk.
+        // JObject oas = new JObject(
+        //     //OpenAPI intro block
+        //     new JProperty(OPENAPI, "3.0.0")
+        //     ,new JProperty(INFO, new JObject(
+        //         new JProperty(TITLE, "Platform")
+        //         ,new JProperty(DESCRIPTION, "MX Platform OpenAPI Spec")
+        //         ,new JProperty(VERSION, "1.0")
+        //     ))
+        //     //Servers
+        //     ,new JProperty(SERVERS, new JArray{
+        //         new JObject(new JProperty(URL, "http://api.mx.local:3000"))
+        //     })
+        //     //Paths
+        //     ,new JProperty(PATHS, new JObject(
+        //         new JProperty("endpoint path 1", new JObject(
+        //             new JProperty("endpoint verb", new JObject(
+        //                 new JProperty(TAGS, new JArray{
+        //                     "endpoint tags like Holdings",
+        //                     "another endpoint tag"
+        //                 })
+        //                 ,new JProperty(OP_ID, "operationId here")
+        //                 ,new JProperty(PARAMETERS, new JArray{
+        //                     new JObject(new JProperty(NAME, "paramName")
+        //                                 ,new JProperty(DESCRIPTION, "param description")
+        //                                 ,new JProperty(REQUIRED, "isRequired")
+        //                                 ,new JProperty(IN, "paramLocation")
+        //                                 ,new JProperty(SCHEMA, new JObject(
+        //                                     new JProperty(TYPE, "dataType")
+        //                                 )))
+        //                 })
+        //                 ,new JProperty(RESPONSES, new JObject(
+        //                     new JProperty(RESP_CODE, new JObject(
+        //                         new JProperty(DESCRIPTION, "response description")
+        //                         ,new JProperty(CONTENT, new JObject(
+        //                             new JProperty("response content type (application/json)", new JObject(
+        //                                 new JProperty(SCHEMA, new JObject(
+        //                                     new JProperty(TYPE, "array")
+        //                                     ,new JProperty(ITEMS, new JObject(
+        //                                         new JProperty("$ref", "#/components/Holding")
+        //                                     ))
+        //                                 ))
+        //                                 ,new JProperty(EXAMPLE, new JObject(
+        //                                     new JProperty("example, like HoldingsResponse", "example string literal of JSON response")
+        //                                 ))
+        //                             ))
+        //                         ))
+        //                     ))
+        //                     ,new JProperty("nextResponseCode", "more response code objects")
+        //                 ))
+        //             ))
+        //         ))
+        //     ))
+        //     //Tags array
+        //     ,new JProperty(TAGS, new JArray{
+        //         new JObject(new JProperty(NAME, "tagName1")
+        //                     ,new JProperty(DESCRIPTION, "tag description 1"))
+        //         ,new JObject(new JProperty(NAME, "tagName2")
+        //                     ,new JProperty(DESCRIPTION, "tag description 2"))
+        //     })
+        //     //Components (complex datatypes)
+        //     ,new JProperty(COMPONENTS, new JObject(
+        //         new JProperty(SCHEMAS, new JObject(
+        //             new JProperty("complexDataType 1", new JObject(
+        //                 new JProperty(TYPE, "object")
+        //                 ,new JProperty(PROPERTIES, new JObject(
+        //                     new JProperty("component datatype name 1 (like 'guid')", new JObject(
+        //                         new JProperty(TYPE, "string/datatype")
+        //                         ,new JProperty(EXAMPLE, "string literal example")
+        //                     ))
+        //                     ,new JProperty("component datatype 2(like 'value')", new JObject(
+        //                         new JProperty(TYPE, "string")
+        //                         ,new JProperty(EXAMPLE, "string literal example")
+        //                     ))
+        //                 ))
+        //             ))
+
+        //         ))
+        //     ))
+
+        // );
 
         return oas;
     }

@@ -45,14 +45,17 @@ internal partial class Program
         //Go through list of controller paths.
         ParseControllerDocs(_endpoints, controllerFiles);
 
-        string deleteMe = ClassesToJsonConverter.ConvertEndpoints(_endpoints);
-        Console.WriteLine(deleteMe);
+        // string deleteMe = ClassesToJsonConverter.ConvertEndpoints(_endpoints);
+        // Console.WriteLine(deleteMe);
 
-        StreamReader sr = new StreamReader(@"../GenerateOAS/DocumentObjects/openapi.json");
-        string oasString = sr.ReadToEnd();
-        JsonTextReader jsonTextReader = new JsonTextReader(sr);
-        JObject oasObj = JObject.Parse(oasString);
-        CompoundEndpoint.AggregateEndpointsByPath(_endpoints);
+        // StreamReader sr = new StreamReader(@"../GenerateOAS/DocumentObjects/openapi.json");
+        // string oasString = sr.ReadToEnd();
+        // JsonTextReader jsonTextReader = new JsonTextReader(sr);
+        // JObject oasObj = JObject.Parse(oasString);
+        var aggdEps = CompoundEndpoint.AggregateEndpointsByPath(_endpoints);
+        var fullOasObj = OpenApiConverter.BuildOpenApi(aggdEps, _models);
+
+        Console.WriteLine(JsonConvert.SerializeObject(fullOasObj, Formatting.Indented));
     }
 
     /// <summary>
