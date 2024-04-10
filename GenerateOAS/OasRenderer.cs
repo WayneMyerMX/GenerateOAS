@@ -73,44 +73,6 @@ public class OpenApiConverter
                     ))
                     )
                 )
-
-                ,new JProperty("endpoint path 1", new JObject(
-                    new JProperty("endpoint verb", new JObject(
-                        new JProperty(TAGS, new JArray{
-                            "endpoint tags like Holdings",
-                            "another endpoint tag"
-                        })
-                        ,new JProperty(OP_ID, "operationId here")
-                        ,new JProperty(PARAMETERS, new JArray{
-                            new JObject(new JProperty(NAME, "paramName")
-                                        ,new JProperty(DESCRIPTION, "param description")
-                                        ,new JProperty(REQUIRED, "isRequired")
-                                        ,new JProperty(IN, "paramLocation")
-                                        ,new JProperty(SCHEMA, new JObject(
-                                            new JProperty(TYPE, "dataType")
-                                        )))
-                        })
-                        ,new JProperty(RESPONSES, new JObject(
-                            new JProperty(RESP_CODE, new JObject(
-                                new JProperty(DESCRIPTION, "response description")
-                                ,new JProperty(CONTENT, new JObject(
-                                    new JProperty("response content type (application/json)", new JObject(
-                                        new JProperty(SCHEMA, new JObject(
-                                            new JProperty(TYPE, "array")
-                                            ,new JProperty(ITEMS, new JObject(
-                                                new JProperty("$ref", "#/components/Holding")
-                                            ))
-                                        ))
-                                        ,new JProperty(EXAMPLE, new JObject(
-                                            new JProperty("example, like HoldingsResponse", "example string literal of JSON response")
-                                        ))
-                                    ))
-                                ))
-                            ))
-                            ,new JProperty("nextResponseCode", "more response code objects")
-                        ))
-                    ))
-                ))
             ))
             //Tags array
             ,new JProperty(TAGS, new JArray{
